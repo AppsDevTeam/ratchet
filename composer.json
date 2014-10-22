@@ -1,5 +1,5 @@
 {
-	"name": "frosty22/ratchet",
+	"name": "adt/ratchet",
 	"type": "library",
 	"description": "Library for Ratchet IO server with Nette",
 	"license": ["BSD-3-Clause", "GPL-2.0", "GPL-3.0"],
