@@ -16,11 +16,13 @@
 	"require": {
 		"php": ">= 5.3.9",
 		"nette/nette": "2.*",
-		"cboden/Ratchet": "0.3.*"
+		"cboden/ratchet": "0.3.*",
+		"react/zmq": "0.2.*|0.3.*",
+		"symfony/http-foundation": "2.5.5"
 	},
 	"autoload": {
 		"psr-4": {
-			"ADT\\Ratchet" : "src/"
+			"ADT\\Ratchet\\" : "src/"
 		}
 	}
 }
