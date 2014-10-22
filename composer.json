@@ -2,15 +2,16 @@
 	"name": "adt/ratchet",
 	"type": "library",
 	"description": "Library for Ratchet IO server with Nette",
+	"keywords": ["nette", "ratchet", "appsdevteam", "frosty22"],
 	"license": ["BSD-3-Clause", "GPL-2.0", "GPL-3.0"],
 	"authors": [
 		{
-			"name": "ADT",
-			"homepage": "http://appsdevteam.com"
-		},
-		{
 			"name": "Vít Ledvinka",
 			"homepage": "http://www.frosty22.cz"
+		},
+		{
+			"name": "ADT",
+			"homepage": "http://appsdevteam.com"
 		}
 	],
 	"require": {
