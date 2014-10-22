@@ -14,6 +14,7 @@ use Nette\Config\CompilerExtension;
  */
 class RatchetExtension extends CompilerExtension {
 
+	const CONTROL_TAG = 'ratchet.control';
 
 	/**
 	 * @var array
@@ -56,6 +57,16 @@ class RatchetExtension extends CompilerExtension {
 			->setClass('Ale\Ratchet\Server', array($application, $loop, $config['server'], $config['port']));
 
 
+	}
+	
+	public function beforeCompile()
+	{
+		$builder = $this->getContainerBuilder();
+		
+		$application = $builder->getDefinition($this->prefix('application'));
+		foreach ($builder->findByTag(self::CONTROL_TAG) as $controlId => $meta) {
+			$application->addSetup('addControl', array('@' . $controlId));
+		}
 	}
 
 }

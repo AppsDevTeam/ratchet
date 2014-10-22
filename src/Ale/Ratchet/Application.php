@@ -44,6 +44,8 @@ class Application extends \Nette\Object implements MessageComponentInterface {
 	 * @var IRouter
 	 */
 	private $router;
+	
+	protected $controls;
 
 
 	/**
@@ -56,6 +58,10 @@ class Application extends \Nette\Object implements MessageComponentInterface {
 		$this->container = $container;
 		$this->connectionStorage = $connection;
 		$this->router = $router;
+	}
+	
+	public function addControl($a) {
+		print_r($a);
 	}
 
 
