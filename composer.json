@@ -19,11 +19,8 @@
 		"cboden/Ratchet": "0.3.*"
 	},
 	"autoload": {
-		"psr-0": {
-			"ADT\\Ratchet" : "src"
-		},
-		"classmap": [
-			"src/ADT/Ratchet/exceptions.php"
-		]
+		"psr-4": {
+			"ADT\\Ratchet" : "src/"
+		}
 	}
 }
