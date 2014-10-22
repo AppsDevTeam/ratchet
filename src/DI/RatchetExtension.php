@@ -14,7 +14,7 @@ use Nette\Config\CompilerExtension;
  */
 class RatchetExtension extends CompilerExtension {
 
-	const CONTROL_TAG = 'ratchet.control';
+	const CONTROLLER_TAG = 'ratchet.controller';
 
 	/**
 	 * @var array
@@ -51,7 +51,7 @@ class RatchetExtension extends CompilerExtension {
 			->setFactory('React\EventLoop\Factory::create');
 
 		$application = $builder->addDefinition($this->prefix('application'))
-			->setClass('ADT\Ratchet\Application');
+			->setClass('ADT\Ratchet\ControllerApplication');
 
 		$builder->addDefinition($this->prefix('server'))
 			->setClass('ADT\Ratchet\Server', array($application, $loop, $config['server'], $config['port']));
@@ -64,8 +64,8 @@ class RatchetExtension extends CompilerExtension {
 		$builder = $this->getContainerBuilder();
 		
 		$application = $builder->getDefinition($this->prefix('application'));
-		foreach ($builder->findByTag(self::CONTROL_TAG) as $controlId => $meta) {
-			$application->addSetup('addControl', array('@' . $controlId));
+		foreach ($builder->findByTag(self::CONTROLLER_TAG) as $controllerId => $meta) {
+			$application->addSetup('addController', array('@' . $controllerId));
 		}
 	}
 

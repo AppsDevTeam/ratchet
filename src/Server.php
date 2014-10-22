@@ -28,7 +28,7 @@ class Server extends \Nette\Object {
 
 
 	/**
-	 * @var Application
+	 * @var ControllerApplication
 	 */
 	private $application;
 
@@ -40,12 +40,12 @@ class Server extends \Nette\Object {
 
 
 	/**
-	 * @param Application $application
+	 * @param ControllerApplication $application
 	 * @param LoopInterface $loop
 	 * @param string $server The address to receive sockets on (0.0.0.0 means receive connections from any)
 	 * @param int $port The port to server sockets on
 	 */
-	public function __construct(Application $application, LoopInterface $loop, $server, $port)
+	public function __construct(ControllerApplication $application, LoopInterface $loop, $server, $port)
 	{
 		$this->application = $application;
 		$this->server = $server;
