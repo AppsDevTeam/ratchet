@@ -5,6 +5,10 @@
 	"license": ["BSD-3-Clause", "GPL-2.0", "GPL-3.0"],
 	"authors": [
 		{
+			"name": "ADT",
+			"homepage": "http://appsdevteam.com"
+		},
+		{
 			"name": "Vít Ledvinka",
 			"homepage": "http://www.frosty22.cz"
 		}
@@ -16,10 +20,10 @@
 	},
 	"autoload": {
 		"psr-0": {
-			"Ale\\Ratchet" : "src/Ale/Ratchet"
+			"ADT\\Ratchet" : "src"
 		},
 		"classmap": [
-			"src/Ale/Ratchet/exceptions.php"
+			"src/ADT/Ratchet/exceptions.php"
 		]
 	}
 }
