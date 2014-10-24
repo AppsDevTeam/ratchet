@@ -47,6 +47,11 @@ class Application extends \Nette\Object implements MessageComponentInterface {
 	
 	protected $controls;
 
+	/**
+	 * @var ServerProtocol
+	 */
+	private $wampProtocol;
+
 
 	/**
 	 * @param Container $container Service locator for inject services to the control

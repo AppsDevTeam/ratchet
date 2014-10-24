@@ -14,18 +14,13 @@ use ADT\Ratchet\Response\IResponse;
 abstract class Controller extends \Nette\Object {
 
 
-	/**
-	 * @var ConnectionStorage
-	 */
-	private $connectionStorage;
 
 
 	/**
 	 * @param ConnectionStorage $connection
 	 */
-	final public function __construct(ConnectionStorage $connection)
+	final public function __construct()
 	{
-		$this->connectionStorage = $connection;
 	}
 
 
@@ -34,7 +29,6 @@ abstract class Controller extends \Nette\Object {
 	 */
 	public function getConnectionStorage()
 	{
-		return $this->connectionStorage;
 	}
 
 

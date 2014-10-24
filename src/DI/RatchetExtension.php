@@ -20,13 +20,8 @@ class RatchetExtension extends CompilerExtension {
 	 * @var array
 	 */
 	private $defaults = array(
-		"server" 	=> "0.0.0.0",
+		"httpHost" 	=> "0.0.0.0",
 		"port"		=> 8080,
-		"router"	=> array(
-			"namespace"	=> "App",
-			"control"	=> "Default",
-			"handle"	=> "default"
-		)
 	);
 
 
@@ -38,23 +33,23 @@ class RatchetExtension extends CompilerExtension {
 		$config = $this->getConfig($this->defaults);
 
 		$builder = $this->getContainerBuilder();
-
-		$builder->addDefinition($this->prefix('router'))
-			->setClass('ADT\Ratchet\Router\SimpleRouter', array($config["router"]["namespace"],
-				$config["router"]["control"], $config["router"]["handle"]));
-
+		
+		/*
 		$builder->addDefinition($this->prefix('connectionStorage'))
 			->setClass('ADT\Ratchet\ConnectionStorage');
-
+		*/
+		
 		$loop = $builder->addDefinition($this->prefix('loop'))
 			->setClass('React\EventLoop\LoopInterface')
 			->setFactory('React\EventLoop\Factory::create');
 
+		/*
 		$application = $builder->addDefinition($this->prefix('application'))
 			->setClass('ADT\Ratchet\ControllerApplication');
-
+		*/
+		
 		$builder->addDefinition($this->prefix('server'))
-			->setClass('ADT\Ratchet\Server', array($application, $loop, $config['server'], $config['port']));
+			->setClass('ADT\Ratchet\Server', array(/*$application, */$loop, $config['httpHost'], $config['port']));
 
 
 	}
@@ -63,10 +58,17 @@ class RatchetExtension extends CompilerExtension {
 	{
 		$builder = $this->getContainerBuilder();
 		
+		/*
 		$application = $builder->getDefinition($this->prefix('application'));
 		foreach ($builder->findByTag(self::CONTROLLER_TAG) as $controllerId => $meta) {
 			$application->addSetup('addController', array('@' . $controllerId));
 		}
+		*/
+		
+		$server = $builder->getDefinition($this->prefix('server'));
+		
+		// TODO: přesunout do neonu a brát z neonu
+		$server->addSetup('route', array('/lock', '@\App\RatchetModule\Controllers\ILockControllerFactory', NULL, 'demo'));
 	}
 
 }
