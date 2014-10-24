@@ -2,7 +2,7 @@
 
 namespace ADT\Ratchet;
 
-use ADT\Ratchet\Router;
+use ADT\Ratchet\Router\Router;
 use Nette\ComponentModel\Container;
 use React\EventLoop\LoopInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler;
@@ -98,7 +98,12 @@ class Server extends \Nette\Object {
 			}
 			*/
 			
-			$this->routes->add('rr-' . ++$this->_routeCounter, new Route($path, array('_controller' => $controller, '_identifier' => $identifier), array('Origin' => $this->httpHost), array(), $httpHost));
+			p('-- SERVER');
+			p($path);
+			p(get_class($controller));
+			p($identifier);
+			
+			$this->routes->add('rr-' . ++$this->_routeCounter, new Route($path, array('_controller' => $controller, '_identifier' => $identifier), array('Origin' => $this->httpHost), array()/*, $httpHost*/));
 
 			return $controller;
 	}
