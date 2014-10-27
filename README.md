@@ -83,6 +83,10 @@ class InstantionResolver implements \ADT\Ratchet\Controllers\IInstantionResolver
 
 TODO: ZMQ model
 
+## Debugování
+
+TODO: ADT\Dumper, vytvořit Debug Componentu, ke které by se přihlásil jeden uživatel a na ten by se odesílal všechen výstup (subscribe k _debug)?
+
 ## TODOs
 
 1. Přidat do configu možnost `autoDestroy`: pokud je Controller dynamicky vytvořen a všichni uživatelé se odpojili, smaž imstanci Controlleru.

@@ -41,13 +41,20 @@ class Router extends \Ratchet\Http\Router {
 			return $this->close($conn, 404);
 		}
 
-		$instantionResolver = $route['_instantionResolver'];	// TODO: toto nebdue proměnná, ale callback, který dostane parametry routy
-		$instantionResolver->getInstantionIdentifier($conn, $request);
-		if (! isset($this->controllers[$instantionResolver])) {
-			// Vytvoř nový controller pomocí továrny
-			$this->controllers[$instantionResolver] = $route['_controller']->create();
+		if ($route['_instantionResolver'] === NULL) {
+			$instantionId = '_';
+		} else {
+			$instantionId = $route['_instantionResolver']->getInstantionIdentifier($request, $conn);
 		}
-		$controller = $this->controllers[$instantionResolver];
+		if (! isset($this->controllers[$instantionId])) {
+			if ($route['_controller'] instanceof \Ratchet\ComponentInterface) {
+				$this->controllers[$instantionId] = $route['_controller'];
+			} else {
+				// Vytvoř nový controller pomocí továrny
+				$this->controllers[$instantionId] = $route['_controller']->create();
+			}
+		}
+		$controller = $this->controllers[$instantionId];
 		
 		if ($controller instanceof HttpServerInterface || $controller instanceof WsServer) {
 				$decorated = $controller;
