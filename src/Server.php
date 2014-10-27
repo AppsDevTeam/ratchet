@@ -71,7 +71,7 @@ class Server extends \Nette\Object {
 		$this->routes  = new RouteCollection;
 	}
 	
-	public function route($path, $controller/*, array $allowedOrigins = array()*/, $httpHost = null, $instantionResolver = NULL) {
+	public function route($path, $controller/*, array $allowedOrigins = array()*/, Controllers\IInstantionResolver $instantionResolver, $httpHost = null) {
 			/*
 			if ($controller instanceof HttpServerInterface || $controller instanceof WsServer) {
 					$decorated = $controller;
@@ -98,10 +98,8 @@ class Server extends \Nette\Object {
 			}
 			*/
 			
-			p('-- SERVER');
+			p('-- route');
 			p($path);
-			p(get_class($controller));
-			p($instantionResolver);
 			
 			$this->routes->add('rr-' . ++$this->_routeCounter, new Route($path, array('_controller' => $controller, '_instantionResolver' => $instantionResolver), array('Origin' => $this->httpHost), array()/*, $httpHost*/));
 

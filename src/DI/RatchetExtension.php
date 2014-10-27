@@ -18,7 +18,7 @@ class RatchetExtension extends CompilerExtension {
 	
 	protected static $routeDefaults = array(
 		"httpHost" => NULL,
-		"instantionResolver" => NULL,
+		"instantionResolver" => '@ADT\Ratchet\Controllers\NullResolver',
 	);
 	
 	protected $config;
@@ -39,6 +39,9 @@ class RatchetExtension extends CompilerExtension {
 
 		$builder->addDefinition($this->prefix('server'))
 			->setClass('ADT\Ratchet\Server', array(/*$application, */$loop, $this->config['httpHost'], $this->config['port']));
+
+		$builder->addDefinition($this->prefix('nullResolver'))
+			->setClass('ADT\Ratchet\Controllers\NullResolver');
 
 
 	}
@@ -71,8 +74,8 @@ class RatchetExtension extends CompilerExtension {
 				$server->addSetup('route', array(
 					$route['path'],
 					$route['controller'],
-					$route['httpHost'],
 					$route['instantionResolver'],
+					$route['httpHost'],
 				));
 			}
 		}
