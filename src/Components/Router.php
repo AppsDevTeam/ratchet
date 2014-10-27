@@ -1,6 +1,6 @@
 <?php
 
-namespace ADT\Ratchet\Router;
+namespace ADT\Ratchet\Components;
 
 use Ratchet\ConnectionInterface;
 use Guzzle\Http\Url;
@@ -41,12 +41,13 @@ class Router extends \Ratchet\Http\Router {
 			return $this->close($conn, 404);
 		}
 
-		$identifier = $route['_identifier'];	// TODO: toto nebdue proměnná, ale callback, který dostane parametry routy
-		if (! isset($this->controllers[$identifier])) {
+		$instantionResolver = $route['_instantionResolver'];	// TODO: toto nebdue proměnná, ale callback, který dostane parametry routy
+		$instantionResolver->getInstantionIdentifier($conn, $request);
+		if (! isset($this->controllers[$instantionResolver])) {
 			// Vytvoř nový controller pomocí továrny
-			$this->controllers[$identifier] = $route['_controller']->create();
+			$this->controllers[$instantionResolver] = $route['_controller']->create();
 		}
-		$controller = $this->controllers[$identifier];
+		$controller = $this->controllers[$instantionResolver];
 		
 		if ($controller instanceof HttpServerInterface || $controller instanceof WsServer) {
 				$decorated = $controller;

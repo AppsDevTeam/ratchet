@@ -2,16 +2,8 @@
 
 namespace ADT\Ratchet\DI;
 
-use Nette\Config\CompilerExtension;
+use Nette\DI\CompilerExtension;
 
-/**
- *
- * Install ratchet server and other components to container.
- *
- * @copyright Copyright (c) 2013 Ledvinka Vít
- * @author Ledvinka Vít, frosty22 <ledvinka.vit@gmail.com>
- *
- */
 class RatchetExtension extends CompilerExtension {
 
 	const CONTROLLER_TAG = 'ratchet.controller';
@@ -19,10 +11,17 @@ class RatchetExtension extends CompilerExtension {
 	/**
 	 * @var array
 	 */
-	private $defaults = array(
+	protected static $defaults = array(
 		"httpHost" 	=> "0.0.0.0",
 		"port"		=> 8080,
 	);
+	
+	protected static $routeDefaults = array(
+		"httpHost" => NULL,
+		"instantionResolver" => NULL,
+	);
+	
+	protected $config;
 
 
 	/**
@@ -30,7 +29,7 @@ class RatchetExtension extends CompilerExtension {
 	 */
 	public function loadConfiguration()
 	{
-		$config = $this->getConfig($this->defaults);
+		$this->config = $this->getConfig(self::$defaults);
 
 		$builder = $this->getContainerBuilder();
 		
@@ -39,7 +38,7 @@ class RatchetExtension extends CompilerExtension {
 			->setFactory('React\EventLoop\Factory::create');
 
 		$builder->addDefinition($this->prefix('server'))
-			->setClass('ADT\Ratchet\Server', array(/*$application, */$loop, $config['httpHost'], $config['port']));
+			->setClass('ADT\Ratchet\Server', array(/*$application, */$loop, $this->config['httpHost'], $this->config['port']));
 
 
 	}
@@ -57,8 +56,27 @@ class RatchetExtension extends CompilerExtension {
 		
 		$server = $builder->getDefinition($this->prefix('server'));
 		
-		// TODO: přesunout do neonu a brát z neonu
-		$server->addSetup('route', array('/lock', '@\App\RatchetModule\Controllers\ILockControllerFactory', NULL, 'demo'));
+		if (isset($this->config['routes'])) {
+			foreach ($this->config['routes'] as $path => $route) {
+				
+				if (! is_array($route)) {
+					$route = array(
+						'controller' => $route,
+					);
+				}
+				
+				$route['path'] = $path;
+				$route = \Nette\DI\Config\Helpers::merge($route, self::$routeDefaults);
+				
+				$server->addSetup('route', array(
+					$route['path'],
+					$route['controller'],
+					$route['httpHost'],
+					$route['instantionResolver'],
+				));
+			}
+		}
+		
 	}
 
 }
