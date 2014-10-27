@@ -2,7 +2,7 @@
 
 namespace ADT\Ratchet;
 
-use ADT\Ratchet\Router\Router;
+use ADT\Ratchet\Components\Router;
 use Nette\ComponentModel\Container;
 use React\EventLoop\LoopInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler;

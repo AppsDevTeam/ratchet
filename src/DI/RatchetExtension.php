@@ -34,20 +34,10 @@ class RatchetExtension extends CompilerExtension {
 
 		$builder = $this->getContainerBuilder();
 		
-		/*
-		$builder->addDefinition($this->prefix('connectionStorage'))
-			->setClass('ADT\Ratchet\ConnectionStorage');
-		*/
-		
 		$loop = $builder->addDefinition($this->prefix('loop'))
 			->setClass('React\EventLoop\LoopInterface')
 			->setFactory('React\EventLoop\Factory::create');
 
-		/*
-		$application = $builder->addDefinition($this->prefix('application'))
-			->setClass('ADT\Ratchet\ControllerApplication');
-		*/
-		
 		$builder->addDefinition($this->prefix('server'))
 			->setClass('ADT\Ratchet\Server', array(/*$application, */$loop, $config['httpHost'], $config['port']));
 
