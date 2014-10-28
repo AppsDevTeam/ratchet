@@ -6,19 +6,23 @@ use Nette\DI\CompilerExtension;
 
 class RatchetExtension extends CompilerExtension {
 
-	const CONTROLLER_TAG = 'ratchet.controller';
-
 	/**
 	 * @var array
 	 */
 	protected static $defaults = array(
-		"httpHost" 	=> "0.0.0.0",
-		"port"		=> 8080,
+		'httpHost' => '0.0.0.0',
+		'port' => 8080,
+		'sessionProvider' => array(
+			'handler' => 'memcached',
+			'httpHost' => 'localhost',
+			'port' => 11211,
+		),
 	);
 	
 	protected static $routeDefaults = array(
-		"httpHost" => NULL,
-		"instantionResolver" => '@ADT\Ratchet\Controllers\NullResolver',
+		'httpHost' => '',
+		'instantionResolver' => '@ADT\Ratchet\Controllers\NullResolver',
+		'wrapped' => array(),
 	);
 	
 	protected $config;
@@ -38,7 +42,7 @@ class RatchetExtension extends CompilerExtension {
 			->setFactory('React\EventLoop\Factory::create');
 
 		$builder->addDefinition($this->prefix('server'))
-			->setClass('ADT\Ratchet\Server', array(/*$application, */$loop, $this->config['httpHost'], $this->config['port']));
+			->setClass('ADT\Ratchet\Server', array($loop, $this->config));
 
 		$builder->addDefinition($this->prefix('nullResolver'))
 			->setClass('ADT\Ratchet\Controllers\NullResolver');
@@ -49,13 +53,6 @@ class RatchetExtension extends CompilerExtension {
 	public function beforeCompile()
 	{
 		$builder = $this->getContainerBuilder();
-		
-		/*
-		$application = $builder->getDefinition($this->prefix('application'));
-		foreach ($builder->findByTag(self::CONTROLLER_TAG) as $controllerId => $meta) {
-			$application->addSetup('addController', array('@' . $controllerId));
-		}
-		*/
 		
 		$server = $builder->getDefinition($this->prefix('server'));
 		
@@ -76,6 +73,7 @@ class RatchetExtension extends CompilerExtension {
 					$route['controller'],
 					$route['instantionResolver'],
 					$route['httpHost'],
+					$route['wrapped'],
 				));
 			}
 		}

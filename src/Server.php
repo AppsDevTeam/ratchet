@@ -22,15 +22,9 @@ class Server extends \Nette\Object {
 
 
 	/**
-	 * @var string
+	 * @var array
 	 */
-	protected $httpHost;
-
-
-	/**
-	 * @var int
-	 */
-	protected $port;
+	protected $config;
 
 
 	/**
@@ -62,16 +56,15 @@ class Server extends \Nette\Object {
 	 * @param string $httpHost The address to receive sockets on (0.0.0.0 means receive connections from any)
 	 * @param int $port The port to server sockets on
 	 */
-	public function __construct(/*ControllerApplication $application, */LoopInterface $loop, $httpHost, $port)
+	public function __construct(LoopInterface $loop, $config)
 	{
 		//$this->application = $application;
-		$this->httpHost = $httpHost;
-		$this->port = $port;
+		$this->config = $config;
 		$this->loop = $loop;
 		$this->routes  = new RouteCollection;
 	}
 	
-	public function route($path, $controller/*, array $allowedOrigins = array()*/, Controllers\IInstantionResolver $instantionResolver, $httpHost = null) {
+	public function route($path, $controller/*, array $allowedOrigins = array()*/, Controllers\IInstantionResolver $instantionResolver, $httpHost = '', $wrapped = array()) {
 			/*
 			if ($controller instanceof HttpServerInterface || $controller instanceof WsServer) {
 					$decorated = $controller;
@@ -85,7 +78,7 @@ class Server extends \Nette\Object {
 			*/
 			
 			if ($httpHost === null) {
-					$httpHost = $this->httpHost;
+					$httpHost = $this->config['httpHost'];
 			}
 
 			/*
@@ -101,7 +94,20 @@ class Server extends \Nette\Object {
 			p('-- route');
 			p($path);
 			
-			$this->routes->add('rr-' . ++$this->_routeCounter, new Route($path, array('_controller' => $controller, '_instantionResolver' => $instantionResolver), array('Origin' => $this->httpHost), array()/*, $httpHost*/));
+			$route = new Route(
+				$path,
+				array(
+					'_controller' => $controller,
+					'_instantionResolver' => $instantionResolver,
+					'_wrapped' => $wrapped
+				),
+				array(
+					'Origin' => $this->config['httpHost']
+				),
+				array(),
+				$httpHost
+			);
+			$this->routes->add('rr-' . ++$this->_routeCounter, $route);
 
 			return $controller;
 	}
@@ -132,7 +138,7 @@ class Server extends \Nette\Object {
 		$httpServer = new \Ratchet\Http\HttpServer($router);
 		
 		$socket = new \React\Socket\Server($this->loop);
-		$socket->listen($this->port, $this->httpHost);
+		$socket->listen($this->config['port'], $this->config['httpHost']);
 		
 		$server = new \Ratchet\Server\IoServer($httpServer, $socket, $this->loop);
 		$server->run();

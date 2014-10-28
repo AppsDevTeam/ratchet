@@ -24,6 +24,9 @@
 	"autoload": {
 		"psr-4": {
 			"ADT\\Ratchet\\" : "src/"
-		}
+		},
+		"classmap": [
+			"src/exceptions.php"
+		]
 	}
 }

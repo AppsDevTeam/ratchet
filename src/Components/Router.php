@@ -7,6 +7,8 @@ use Guzzle\Http\Url;
 use Guzzle\Http\Message\RequestInterface;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+use Symfony\Component\HttpFoundation\Session\Storage\Handler;
+use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
 use Ratchet\Http\HttpServerInterface;
 use Ratchet\Wamp\WampServerInterface;
 use Ratchet\WebSocket\WsServer;
@@ -15,6 +17,14 @@ use Ratchet\Wamp\WampServer;
 class Router extends \Ratchet\Http\Router {
 
 	protected $controllers;
+	
+	protected $config;
+	
+	public function __construct(UrlMatcherInterface $matcher, $config) {
+		parent::__construct($matcher);
+		
+		$this->config = $config;
+	}
 	
 	/**
 	 * {@inheritdoc}
@@ -28,7 +38,9 @@ class Router extends \Ratchet\Http\Router {
 		$context = $this->_matcher->getContext();
 		$context->setMethod($request->getMethod());
 		$context->setHost($request->getHost());
-
+		
+		// route
+		
 		try {
 			p('-- ROUTER');
 			p($request->getPath());
@@ -41,6 +53,8 @@ class Router extends \Ratchet\Http\Router {
 			return $this->close($conn, 404);
 		}
 
+		// get controller instantion or create new one
+		
 		if ($route['_instantionResolver'] === NULL) {
 			$instantionId = '_';
 		} else {
@@ -56,19 +70,25 @@ class Router extends \Ratchet\Http\Router {
 		}
 		$controller = $this->controllers[$instantionId];
 		
-		if ($controller instanceof HttpServerInterface || $controller instanceof WsServer) {
-				$decorated = $controller;
-		} elseif ($controller instanceof WampServerInterface) {
-				$decorated = new WsServer(new WampServer($controller));
-		} elseif ($controller instanceof MessageComponentInterface) {
-				$decorated = new WsServer($controller);
-		} else {
-				$decorated = $controller;
+		// decoration
+		
+		if ($controller instanceof WampServerInterface) {
+			$controller = new WampServer($controller);
+		}
+		
+		if (in_array('sessionProvider', $route['_wrapped'])) {
+			$controller = $this->createSessionProvider($controller, $this->config['sessionProvider']);
+		}
+		
+		if ($controller instanceof MessageComponentInterface && ! ($controller instanceof HttpServerInterface || $controller instanceof WsServer)) {
+			$controller = new WsServer($controller);
 		}
 
-		if (!($decorated instanceof HttpServerInterface)) {
+		if (!($controller instanceof HttpServerInterface)) {
 			throw new \UnexpectedValueException('All routes must implement Ratchet\Http\HttpServerInterface');
 		}
+		
+		// parameters
 		
 		$parameters = array();
 		foreach($route as $key => $value) {
@@ -79,9 +99,34 @@ class Router extends \Ratchet\Http\Router {
 		$url = Url::factory($request->getPath());
 		$url->setQuery($parameters);
 		$request->setUrl($url);
-
-		$conn->controller = $decorated;
+		
+		$conn->controller = $controller;
 		$conn->controller->onOpen($conn, $request);
+	}
+	
+	protected static function createSessionProvider($controller, $config) {
+		
+		switch ($config['handler']) {
+			case 'memcached':
+
+				$memcache = new \Memcached;
+				$memcache->addServer($config['httpHost'], $config['port']);
+				return new Ratchet\Session\SessionProvider(
+					$controller,
+					new Handler\MemcachedSessionHandler(
+						$memcache,
+						array(
+							'prefix' => ini_get('memcached.sess_prefix'),
+						)
+					)
+				);
+				break;
+
+			default:
+				throw new \ADT\Ratchet\Exception("TODO: Session handler '$config[handler]' nebyl implementován");
+				break;
+		}
+		
 	}
 
 }
