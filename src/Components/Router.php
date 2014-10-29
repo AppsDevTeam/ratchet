@@ -52,6 +52,7 @@ class Router extends \Ratchet\Http\Router {
 			p('nfe');
 			return $this->close($conn, 404);
 		}
+		p('found');
 
 		// get controller instantion or create new one
 		
@@ -80,7 +81,7 @@ class Router extends \Ratchet\Http\Router {
 			$controller = $this->createSessionProvider($controller, $this->config['sessionProvider']);
 		}
 		
-		if ($controller instanceof MessageComponentInterface && ! ($controller instanceof HttpServerInterface || $controller instanceof WsServer)) {
+		if ($controller instanceof \Ratchet\WebSocket\WsServerInterface) {
 			$controller = new WsServer($controller);
 		}
 
@@ -111,7 +112,7 @@ class Router extends \Ratchet\Http\Router {
 
 				$memcache = new \Memcached;
 				$memcache->addServer($config['httpHost'], $config['port']);
-				return new Ratchet\Session\SessionProvider(
+				return new \Ratchet\Session\SessionProvider(
 					$controller,
 					new Handler\MemcachedSessionHandler(
 						$memcache,

@@ -10,5 +10,7 @@ namespace ADT\Ratchet {
 	class BadRequestException extends RuntimeException { }
 
 	class InvalidArgumentException extends LogicException { }
+	
+	class ReadOnlyException extends \Exception { }
 
 }

@@ -134,7 +134,7 @@ class Server extends \Nette\Object {
 		$wsServer = new \Ratchet\WebSocket\WsServer($sessionProvider);
 		*/
 		
-		$router = new Router(new UrlMatcher($this->routes, new RequestContext));
+		$router = new Router(new UrlMatcher($this->routes, new RequestContext), $this->config);
 		$httpServer = new \Ratchet\Http\HttpServer($router);
 		
 		$socket = new \React\Socket\Server($this->loop);
