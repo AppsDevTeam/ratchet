@@ -94,20 +94,24 @@ class Server extends \Nette\Object {
 			p('-- route');
 			p($path);
 			
+			$routeName = 'rr-' . ++$this->_routeCounter;
+			
 			$route = new Route(
 				$path,
 				array(
 					'_controller' => $controller,
 					'_instantionResolver' => $instantionResolver,
-					'_wrapped' => $wrapped
+					'_wrapped' => $wrapped,
+					'_name' => $routeName,
 				),
 				array(
 					'Origin' => $this->config['httpHost']
 				),
-				array(),
+				array(
+				),
 				$httpHost
 			);
-			$this->routes->add('rr-' . ++$this->_routeCounter, $route);
+			$this->routes->add($routeName, $route);
 
 			return $controller;
 	}

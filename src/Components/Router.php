@@ -54,40 +54,8 @@ class Router extends \Ratchet\Http\Router {
 		}
 		p('found');
 
-		// get controller instantion or create new one
-		
-		if ($route['_instantionResolver'] === NULL) {
-			$instantionId = '_';
-		} else {
-			$instantionId = $route['_instantionResolver']->getInstantionIdentifier($request, $conn);
-		}
-		if (! isset($this->controllers[$instantionId])) {
-			if ($route['_controller'] instanceof \Ratchet\ComponentInterface) {
-				$this->controllers[$instantionId] = $route['_controller'];
-			} else {
-				// Vytvoř nový controller pomocí továrny
-				$this->controllers[$instantionId] = $route['_controller']->create();
-			}
-		}
-		$controller = $this->controllers[$instantionId];
-		
-		// decoration
-		
-		if ($controller instanceof WampServerInterface) {
-			$controller = new WampServer($controller);
-		}
-		
-		if (in_array('sessionProvider', $route['_wrapped'])) {
-			$controller = $this->createSessionProvider($controller, $this->config['sessionProvider']);
-		}
-		
-		if ($controller instanceof \Ratchet\WebSocket\WsServerInterface) {
-			$controller = new WsServer($controller);
-		}
-
-		if (!($controller instanceof HttpServerInterface)) {
-			throw new \UnexpectedValueException('All routes must implement Ratchet\Http\HttpServerInterface');
-		}
+		$instantionId = $this->getInstantionId($route, $request, $conn);
+		$conn->controller = $this->getController($route, $instantionId);
 		
 		// parameters
 		
@@ -101,8 +69,55 @@ class Router extends \Ratchet\Http\Router {
 		$url->setQuery($parameters);
 		$request->setUrl($url);
 		
-		$conn->controller = $controller;
 		$conn->controller->onOpen($conn, $request);
+	}
+	
+	protected function getInstantionId($route, $request, $conn) {
+		return $route['_instantionResolver']->getInstantionIdentifier($request, $conn);
+	}
+	
+	/**
+	 * Get controller instantion or create new one and decorate it.
+	 * @param array $route
+	 * @param string|int $instantionId
+	 * @return HttpServerInterface
+	 * @throws \UnexpectedValueException
+	 */
+	protected function getController($route, $instantionId) {
+		
+		$controller = $route['_controller'];
+		$routeName = $route['_name'];
+		
+		if (! isset($this->controllers[$routeName][$instantionId])) {
+			if (! ($controller instanceof \Ratchet\ComponentInterface)) {
+				// Vytvoř nový controller pomocí továrny
+				$controller = $controller->create();
+			}
+
+			// decoration
+			
+			$decorated = $controller;
+
+			if ($decorated instanceof WampServerInterface) {
+				$decorated = new WampServer($decorated);
+			}
+
+			if (in_array('sessionProvider', $route['_wrapped'])) {
+				$decorated = $this->createSessionProvider($decorated, $this->config['sessionProvider']);
+			}
+
+			if ($decorated instanceof \Ratchet\WebSocket\WsServerInterface) {
+				$decorated = new WsServer($decorated);
+			}
+
+			if (!($decorated instanceof HttpServerInterface)) {
+				throw new \UnexpectedValueException('All routes must implement Ratchet\Http\HttpServerInterface');
+			}
+		
+			$this->controllers[$routeName][$instantionId] = $decorated;
+		}
+		
+		return $this->controllers[$routeName][$instantionId];
 	}
 	
 	protected static function createSessionProvider($controller, $config) {
