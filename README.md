@@ -90,6 +90,10 @@ TODO: ADT\Dumper, vytvořit Debug Componentu, ke které by se přihlásil jeden 
 ## TODOs
 
 1. Přidat do configu možnost `autoDestroy`: pokud je Controller dynamicky vytvořen a všichni uživatelé se odpojili, smaž imstanci Controlleru.
+2. Benchmark:
+Porovnat NodeJS a Ratchet.
+Rychlost odezvy na jeden jediný request (pokud oboje je 1ms, tak neřešit, ale pokud je jedno z nich 200ms a druhý 1ms, tak je to špaténka).
+Odezva je v 99% 1-2ms (s tím, že se tam započítává nejspíš i nějaký JS balast).
 
 ## Poděkování
 
