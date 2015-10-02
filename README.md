@@ -94,6 +94,16 @@ TODO: ADT\Dumper, vytvořit Debug Componentu, ke které by se přihlásil jeden 
 Porovnat NodeJS a Ratchet.
 Rychlost odezvy na jeden jediný request (pokud oboje je 1ms, tak neřešit, ale pokud je jedno z nich 200ms a druhý 1ms, tak je to špaténka).
 Odezva je v 99% 1-2ms (s tím, že se tam započítává nejspíš i nějaký JS balast).
+3. Chci naše controllery odstínit od toho, aby si museli rozdělovat všechno na subdomény. Pokud se někdo připojí ke konkrétní subdoméně, nemůže komunikovat s nikým jiným. Každý prohlížeč se však může připojit ke všem controllerům své subdomény a také ke všem controllerům domény. Controller nebude řešit subdomény a bude počítat s tím, že se k němu request z jiné subodmény nedostane => toto je třeba řešit v nižších vrstvách.
+4. Router by neměl dostávat přímo Controller, ale továrnu, která se na základě parametrů (v mém případě subdomény) rozhodna zda vytvořit nový Controller a nebo zda vrátit existující, pokud pro subdoménuexistuje.
+
+5. Routa:
+	- Path
+	- Controller class name
+	- Callback, který z parametrů routy vrátí jednoznačný identifikátor
+
+6. odstínit RatchetModel (resp. ZMQ\Context v LockControlleru) od kontroly subdomény
+
 
 ## Poděkování
 
